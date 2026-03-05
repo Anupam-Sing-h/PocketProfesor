@@ -350,7 +350,7 @@ User Input  →  YouTube URL / PDF file
 
 ---
 
-## 📌 Common Practices
+<!-- ## 📌 Common Practices
 
 ### Code Organization
 - **Separation of concerns** — Routers handle HTTP, services contain business logic, models define schemas.
@@ -397,7 +397,7 @@ User Input  →  YouTube URL / PDF file
 - Comprehensive `.gitignore` covering Node, Python, IDE, and OS-specific files.
 - Only `.env.example` files are tracked.
 
----
+--- -->
 
 ## 📄 License
 
