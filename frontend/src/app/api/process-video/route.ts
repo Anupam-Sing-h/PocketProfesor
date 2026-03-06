@@ -41,12 +41,23 @@ export async function POST(request: NextRequest) {
             duration = result.duration;
             languageCode = result.languageCode;
         } catch (err) {
-            console.error('Transcript fetch error:', err);
-            const message = err instanceof Error ? err.message : 'Unknown error';
-            return NextResponse.json(
-                { detail: `Failed to fetch transcript: ${message}` },
-                { status: 400 }
-            );
+            console.warn('Frontend transcript fetch failed, falling back to backend:', err);
+
+            // Fallback: let the backend try fetching the transcript
+            const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000';
+            const response = await fetch(`${backendUrl}/process-video`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                return NextResponse.json(data, { status: response.status });
+            }
+
+            return NextResponse.json(data);
         }
 
         if (!transcriptText) {
