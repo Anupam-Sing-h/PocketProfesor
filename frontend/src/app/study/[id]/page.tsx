@@ -13,6 +13,7 @@ import { ProgressRing } from "@/components/ui/progress-ring";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { useContentStatus } from "@/hooks/use-content-status";
+import type { Content } from "@/types";
 
 export default function StudyDashboardPage() {
     const params = useParams();
@@ -125,15 +126,42 @@ export default function StudyDashboardPage() {
         }
     };
 
-    if (isLoading && status !== 'processing') {
+    const [optimisticData] = useState<{ title: string, status: string, type: string } | null>(() => {
+        if (typeof window !== 'undefined') {
+            const data = sessionStorage.getItem(`content_init_${contentId}`);
+            if (data) return JSON.parse(data);
+        }
+        return null;
+    });
+
+    const displayContent = content || (optimisticData ? {
+        id: contentId,
+        title: optimisticData.title,
+        status: optimisticData.status,
+        source_type: optimisticData.type,
+        source_url: "",
+        raw_text: "",
+        created_at: new Date().toISOString()
+    } as Content : null);
+
+    const displayStatus = status === 'error' ? 'error' : (content ? status : (optimisticData?.status || status));
+
+    // Clear session storage if content is actually loaded and ready
+    useEffect(() => {
+        if (content && content.status !== 'processing') {
+            sessionStorage.removeItem(`content_init_${contentId}`);
+        }
+    }, [content, contentId]);
+
+    if (isLoading && status !== 'processing' && !displayContent) {
         return <PageLoading count={3} />;
     }
 
-    if (!content) {
-        return null;
+    if (!displayContent) {
+        return <PageLoading count={3} />;
     }
 
-    if (status === 'error') {
+    if (displayStatus === 'error') {
         return (
             <div className="mx-auto max-w-2xl mt-12">
                 <Card className="glass flex flex-col items-center justify-center p-12 text-center border-red-500/20">
@@ -161,44 +189,44 @@ export default function StudyDashboardPage() {
             {/* Context Header */}
             <div className="space-y-4">
                 <div className="flex items-center gap-3 mb-2">
-                    <Badge variant="outline" className={`font-medium capitalize ${content.source_type === 'youtube' ? 'text-red-500 border-red-500/30 bg-red-500/5' : 'text-blue-500 border-blue-500/30 bg-blue-500/5'}`}>
-                        {content.source_type === 'youtube' ? <Youtube className="w-3 h-3 mr-1 inline" /> : <FileText className="w-3 h-3 mr-1 inline" />}
-                        {content.source_type}
+                    <Badge variant="outline" className={`font-medium capitalize ${displayContent.source_type === 'youtube' ? 'text-red-500 border-red-500/30 bg-red-500/5' : 'text-blue-500 border-blue-500/30 bg-blue-500/5'}`}>
+                        {displayContent.source_type === 'youtube' ? <Youtube className="w-3 h-3 mr-1 inline" /> : <FileText className="w-3 h-3 mr-1 inline" />}
+                        {displayContent.source_type}
                     </Badge>
-                    <Badge variant="outline" className={`font-medium capitalize ${status === 'ready' ? 'text-green-500 border-green-500/30 bg-green-500/5' : status === 'processing' ? 'text-yellow-500 border-yellow-500/30 bg-yellow-500/5' : 'text-red-500 border-red-500/30 bg-red-500/5'}`}>
-                        {status}
+                    <Badge variant="outline" className={`font-medium capitalize ${displayStatus === 'ready' ? 'text-green-500 border-green-500/30 bg-green-500/5' : displayStatus === 'processing' ? 'text-yellow-500 border-yellow-500/30 bg-yellow-500/5' : 'text-red-500 border-red-500/30 bg-red-500/5'}`}>
+                        {displayStatus}
                     </Badge>
-                    <span className="text-sm text-muted-foreground">{new Date(content.created_at).toLocaleDateString()}</span>
+                    <span className="text-sm text-muted-foreground">{new Date(displayContent.created_at).toLocaleDateString()}</span>
                 </div>
 
-                <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">{content.title}</h1>
+                <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">{displayContent.title}</h1>
 
 
                 <Card className="glass overflow-hidden bg-muted/10 border-muted">
                     <CardContent className="p-4 relative">
-                        {content.source_type === 'youtube' && content.thumbnail_url && (
+                        {displayContent.source_type === 'youtube' && displayContent.thumbnail_url && (
                             <div className="flex flex-col md:flex-row gap-6 items-start">
                                 <div className="w-full md:w-1/3 aspect-video rounded-lg overflow-hidden shrink-0 bg-muted">
-                                    <Image src={content.thumbnail_url} alt="Thumbnail" fill className="object-cover" unoptimized />
+                                    <Image src={displayContent.thumbnail_url} alt="Thumbnail" fill className="object-cover" unoptimized />
                                 </div>
                                 <div className="flex-1">
                                     <h3 className="font-semibold mb-2">Transcript Preview</h3>
                                     <p className="text-sm text-muted-foreground line-clamp-4 leading-relaxed whitespace-pre-wrap">
-                                        {content.raw_text.substring(0, 400)}...
+                                        {displayContent.raw_text ? displayContent.raw_text.substring(0, 400) : "Processing transcript..."}
                                     </p>
                                 </div>
                             </div>
                         )}
-                        {content.source_type === 'pdf' && (
+                        {displayContent.source_type === 'pdf' && (
                             <div className="flex flex-col md:flex-row gap-6 items-start">
                                 <div className="w-full md:w-1/4 h-32 rounded-lg bg-muted flex flex-col gap-2 items-center justify-center border border-dashed shrink-0">
                                     <FileText className="h-8 w-8 text-muted-foreground/50" />
-                                    {content.page_count && <span className="text-xs text-muted-foreground">{content.page_count} Pages</span>}
+                                    {displayContent.page_count && <span className="text-xs text-muted-foreground">{displayContent.page_count} Pages</span>}
                                 </div>
                                 <div className="flex-1">
                                     <h3 className="font-semibold mb-2">Document Preview</h3>
                                     <p className="text-sm text-muted-foreground line-clamp-4 leading-relaxed whitespace-pre-wrap">
-                                        {content.raw_text.substring(0, 400)}...
+                                        {displayContent.raw_text ? displayContent.raw_text.substring(0, 400) : "Extracting text..."}
                                     </p>
                                 </div>
                             </div>

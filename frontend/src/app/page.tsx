@@ -78,6 +78,13 @@ export default function HomePage() {
       setProgress(100);
       setProgressText("Ready!");
       toast.success("Content processed successfully!");
+
+      sessionStorage.setItem(`content_init_${result.content_id}`, JSON.stringify({
+        title: result.title,
+        status: result.status,
+        type: 'youtube'
+      }));
+
       setTimeout(() => router.push(`/study/${result.content_id}`), 500);
     } catch (error) {
       toast.error("Failed to process video", { description: error instanceof Error ? error.message : "Unknown error" });
@@ -128,6 +135,13 @@ export default function HomePage() {
       setProgress(100);
       setProgressText("Ready!");
       toast.success("Content processed successfully!");
+
+      sessionStorage.setItem(`content_init_${result.content_id}`, JSON.stringify({
+        title: result.title,
+        status: result.status,
+        type: 'pdf'
+      }));
+
       setTimeout(() => router.push(`/study/${result.content_id}`), 500);
     } catch (error) {
       toast.error("Failed to process PDF", { description: error instanceof Error ? error.message : "Unknown error" });
