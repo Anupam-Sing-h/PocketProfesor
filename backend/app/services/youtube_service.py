@@ -43,8 +43,9 @@ def _fetch_transcript_sync(video_id: str):
             # Manually parse Netscape/Mozilla cookie format for higher robustness
             jar = http.cookiejar.CookieJar()
             
-            # Clean up: remove surrounding quotes if any
+            # Clean up: remove surrounding quotes if any, and handle literal '\n'
             clean_cookies = cookies_str.strip().strip('"').strip("'")
+            clean_cookies = clean_cookies.replace('\\n', '\n')
             
             count = 0
             for line in clean_cookies.splitlines():
@@ -53,8 +54,9 @@ def _fetch_transcript_sync(video_id: str):
                 if not line or line.startswith('#'):
                     continue
                 
-                # Netscape format is tab-separated
-                parts = line.split('\t')
+                # Netscape format is ideally tab-separated, but Render/Vercel
+                # might convert tabs to spaces. We split on any whitespace up to 6 times.
+                parts = line.split(None, 6)
                 if len(parts) >= 7:
                     domain, flag, path, secure, expiration, name, value = parts[:7]
                     
