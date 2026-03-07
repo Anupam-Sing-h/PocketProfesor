@@ -36,54 +36,86 @@ def _fetch_transcript_sync(video_id: str):
     5. Any available transcript (even non-translatable) → return raw with original lang code
        (will be translated by Gemini in get_transcript).
     """
-    api = YouTubeTranscriptApi()
-    transcript_list_obj = api.list(video_id)
-
-    # Step 1: Try to get an English transcript directly
+    import os
+    import tempfile
+    
+    # Securely load cookies if they exist in the environment
+    cookies_str = os.environ.get("YOUTUBE_COOKIES")
+    temp_cookie_path = None
+    
     try:
-        transcript = transcript_list_obj.find_transcript(['en'])
-        logger.info(f"Found English transcript for {video_id}")
-        return transcript.fetch(), 'en'
-    except Exception:
-        logger.info(f"No manual English transcript for {video_id}")
+        # Create a temporary file to hold the cookies securely
+        if cookies_str:
+            # delete=False because we need to pass the path to the API, and Windows sometimes
+            # locks files preventing other processes from reading them if delete=True
+            fd, temp_cookie_path = tempfile.mkstemp(suffix=".txt")
+            with os.fdopen(fd, 'w', encoding='utf-8') as f:
+                f.write(cookies_str)
+            logger.info("Using secure temporary cookie file for YouTube authentication.")
+            
+        api = YouTubeTranscriptApi()
+        
+        # Use the cookie file if it was successfully created
+        if temp_cookie_path:
+            transcript_list_obj = api.list(video_id, cookies=temp_cookie_path)
+        else:
+            logger.info("No YOUTUBE_COOKIES found. Attempting unauthenticated request.")
+            transcript_list_obj = api.list(video_id)
 
-    try:
-        transcript = transcript_list_obj.find_generated_transcript(['en'])
-        logger.info(f"Found generated English transcript for {video_id}")
-        return transcript.fetch(), 'en'
-    except Exception:
-        logger.info(f"No generated English transcript for {video_id}, trying translation...")
+        # Step 1: Try to get an English transcript directly
+        try:
+            transcript = transcript_list_obj.find_transcript(['en'])
+            logger.info(f"Found English transcript for {video_id}")
+            return transcript.fetch(), 'en'
+        except Exception:
+            logger.info(f"No manual English transcript for {video_id}")
 
-    # Step 2: Try auto-generated transcript in any language → YouTube translate
-    for transcript in transcript_list_obj:
-        if transcript.is_generated and transcript.is_translatable:
-            logger.info(f"YouTube-translating auto-generated '{transcript.language}' ({transcript.language_code}) to English for {video_id}")
-            translated = transcript.translate('en')
-            return translated.fetch(), 'en'
+        try:
+            transcript = transcript_list_obj.find_generated_transcript(['en'])
+            logger.info(f"Found generated English transcript for {video_id}")
+            return transcript.fetch(), 'en'
+        except Exception:
+            logger.info(f"No generated English transcript for {video_id}, trying translation...")
 
-    # Step 3: Try manual transcript in any language → YouTube translate
-    for transcript in transcript_list_obj:
-        if not transcript.is_generated and transcript.is_translatable:
-            logger.info(f"YouTube-translating manual '{transcript.language}' ({transcript.language_code}) to English for {video_id}")
-            translated = transcript.translate('en')
-            return translated.fetch(), 'en'
+        # Step 2: Try auto-generated transcript in any language → YouTube translate
+        for transcript in transcript_list_obj:
+            if transcript.is_generated and transcript.is_translatable:
+                logger.info(f"YouTube-translating auto-generated '{transcript.language}' ({transcript.language_code}) to English for {video_id}")
+                translated = transcript.translate('en')
+                return translated.fetch(), 'en'
 
-    # Step 4: Any translatable transcript → YouTube translate
-    for transcript in transcript_list_obj:
-        if transcript.is_translatable:
-            logger.info(f"YouTube-translating '{transcript.language}' ({transcript.language_code}) to English for {video_id}")
-            translated = transcript.translate('en')
-            return translated.fetch(), 'en'
+        # Step 3: Try manual transcript in any language → YouTube translate
+        for transcript in transcript_list_obj:
+            if not transcript.is_generated and transcript.is_translatable:
+                logger.info(f"YouTube-translating manual '{transcript.language}' ({transcript.language_code}) to English for {video_id}")
+                translated = transcript.translate('en')
+                return translated.fetch(), 'en'
 
-    # Step 5: Fetch any available transcript raw (non-translatable, e.g. Hindi auto-gen)
-    # → will be translated by Gemini AI in get_transcript
-    for transcript in transcript_list_obj:
-        lang_code = transcript.language_code
-        logger.info(f"Fetching raw '{transcript.language}' ({lang_code}) transcript for {video_id} — will use Gemini to translate")
-        return transcript.fetch(), lang_code
+        # Step 4: Any translatable transcript → YouTube translate
+        for transcript in transcript_list_obj:
+            if transcript.is_translatable:
+                logger.info(f"YouTube-translating '{transcript.language}' ({transcript.language_code}) to English for {video_id}")
+                translated = transcript.translate('en')
+                return translated.fetch(), 'en'
 
-    # Truly nothing available
-    raise NoTranscriptFound(video_id, ['en'], transcript_list_obj)
+        # Step 5: Fetch any available transcript raw (non-translatable, e.g. Hindi auto-gen)
+        # → will be translated by Gemini AI in get_transcript
+        for transcript in transcript_list_obj:
+            lang_code = transcript.language_code
+            logger.info(f"Fetching raw '{transcript.language}' ({lang_code}) transcript for {video_id} — will use Gemini to translate")
+            return transcript.fetch(), lang_code
+
+        # Truly nothing available
+        raise NoTranscriptFound(video_id, ['en'], transcript_list_obj)
+        
+    finally:
+        # ALWAYS delete the temporary cookie file to ensure cookies don't leak
+        if temp_cookie_path and os.path.exists(temp_cookie_path):
+            try:
+                os.remove(temp_cookie_path)
+                logger.info("Securely deleted temporary cookie file.")
+            except Exception as e:
+                logger.warning(f"Failed to delete temporary cookie file: {e}")
 
 async def get_transcript(url: str) -> dict:
     """
