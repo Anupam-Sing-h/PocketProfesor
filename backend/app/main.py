@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.routers import content, flashcards, quiz, chat, study_progress
 
-app = FastAPI(title="LearnAI API", version="1.0.0")
+app = FastAPI(title="PocketProfesor API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,

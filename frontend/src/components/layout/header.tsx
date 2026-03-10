@@ -20,7 +20,7 @@ function getPageTitle(pathname: string): string {
     if (pathname.match(/^\/study\/[^/]+\/chat$/)) return "Chat with Content";
     if (pathname.match(/^\/study\/[^/]+$/)) return "Study Dashboard";
 
-    return "LearnAI";
+    return "PocketProfesor";
 }
 
 export function Header() {

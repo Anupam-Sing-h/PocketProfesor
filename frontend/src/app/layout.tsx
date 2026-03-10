@@ -22,7 +22,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "LearnAI — AI Learning Assistant",
+  title: "PocketProfesor — AI Learning Assistant",
   description:
     "Transform YouTube videos and PDFs into interactive flashcards, quizzes, and AI-powered Q&A — powered by Gemini.",
   icons: { icon: '/favicon.ico' },

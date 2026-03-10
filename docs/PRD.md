@@ -1,4 +1,4 @@
-# LearnAI — Product Requirements Document (PRD)
+# PocketProfesor — Product Requirements Document (PRD)
 
 **Version:** 1.0
 **Date:** February 24, 2026
@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary
 
-**LearnAI** is an AI-powered learning assistant that transforms passive content (YouTube videos and PDFs) into active study tools. Users upload a YouTube URL or a PDF document, and the platform automatically processes the content to generate interactive flashcards, multiple-choice quizzes, and a contextual RAG-based chat assistant — enabling deeper understanding and retention of any material.
+**PocketProfesor** is an AI-powered learning assistant that transforms passive content (YouTube videos and PDFs) into active study tools. Users upload a YouTube URL or a PDF document, and the platform automatically processes the content to generate interactive flashcards, multiple-choice quizzes, and a contextual RAG-based chat assistant — enabling deeper understanding and retention of any material.
 
 ### Product Vision
 > *"Any content, instantly learnable."*
@@ -27,7 +27,7 @@ Students and learners face three key challenges:
 | **Manual study prep** | Creating flashcards and quiz questions from content is time-consuming |
 | **No contextual Q&A** | Learners can't ask follow-up questions about specific content they've consumed |
 
-**LearnAI solves all three** by automating study material generation and enabling AI-powered Q&A grounded in the user's own content.
+**PocketProfesor solves all three** by automating study material generation and enabling AI-powered Q&A grounded in the user's own content.
 
 ---
 

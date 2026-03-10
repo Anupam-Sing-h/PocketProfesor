@@ -271,7 +271,7 @@ Replace the contents of `src/app/globals.css` with the Violet Bloom theme tokens
 
 #### 8a. Create `src/components/layout/app-sidebar.tsx`
 - Use the shadcn `Sidebar` component with the following structure:
-  - `SidebarHeader` — App logo/name "LearnAI" + branding
+  - `SidebarHeader` — App logo/name "PocketProfesor" + branding
   - `SidebarContent` — Main navigation menu with `SidebarMenu` and `SidebarMenuItem`:
     - **Home** (icon: `Home`) → `/`
     - **Library** (icon: `Library`) → `/library`
@@ -303,7 +303,7 @@ Replace the contents of `src/app/globals.css` with the Violet Bloom theme tokens
   </ThemeProvider>
   ```
 - Add the Plus Jakarta Sans font via `next/font/google`
-- Set metadata: title "LearnAI — AI Learning Assistant", description
+- Set metadata: title "PocketProfesor — AI Learning Assistant", description
 
 ---
 
@@ -586,7 +586,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.routers import content, flashcards, quiz, chat
 
-app = FastAPI(title="LearnAI API", version="1.0.0")
+app = FastAPI(title="PocketProfesor API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,

@@ -1,4 +1,4 @@
-# 🧠 LearnAI — AI-Powered Learning Platform
+# 🧠 PocketProfesor — AI-Powered Learning Platform
 
 > Transform YouTube videos and PDFs into interactive flashcards, quizzes, and AI-powered Q&A — powered by Google Gemini 2.0 and RAG (Retrieval-Augmented Generation).
 

@@ -22,7 +22,7 @@ The README must include the following sections:
 
 #### 1a. Header & Overview
 ```markdown
-# 🎓 LearnAI — AI Learning Assistant
+# 🎓 PocketProfesor — AI Learning Assistant
 
 An AI-powered learning platform that transforms YouTube videos and PDFs into interactive study tools. Upload content, and the AI generates flashcards, quizzes, and enables contextual chat — powered by Google Gemini and RAG.
 

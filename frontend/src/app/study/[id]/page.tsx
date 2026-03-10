@@ -169,7 +169,9 @@ export default function StudyDashboardPage() {
                         <AlertCircle className="h-8 w-8 text-red-500" />
                     </div>
                     <h2 className="text-2xl font-bold mb-2">Content Processing Failed</h2>
-                    <h3 className="text-2xl font-bold mb-2">Likely Gemini Free Tier Limit Exceeded for the Day(English Video will still be processed)</h3>
+                    <h2 className="font-bold mb-2">Likely Gemini Free Tier Limit Exceeded(PDF will still be processed).</h2>
+                    <br />
+                    <h3 className="font-bold mb-2">Or you an just clone the project and use your own Free Gemini API Key.</h3>
                     <p className="text-muted-foreground mb-6">
                         We encountered an error while analyzing this content. Please try deleting
                         this item from your library and uploading it again.

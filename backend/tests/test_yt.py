@@ -16,7 +16,7 @@ async def test_cookies():
     # Configure logging to see our breadcrumbs
     logging.basicConfig(level=logging.INFO)
     
-    video_url = "https://www.youtube.com/watch?v=--4A0Yatjhc" # Standard video
+    video_url = "https://www.youtube.com/watch?v=6iHrwQ7eFmU" # Standard video
     
     print("\n--- YouTube Cookie Test ---")
     cookies = os.environ.get("YOUTUBE_COOKIES")

@@ -35,7 +35,7 @@ export function AppSidebar() {
                         <GraduationCap className="h-5 w-5" />
                     </div>
                     <span className="text-lg font-bold tracking-tight group-data-[collapsible=icon]:hidden">
-                        LearnAI
+                        PocketProfesor
                     </span>
                 </Link>
             </SidebarHeader>

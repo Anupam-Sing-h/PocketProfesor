@@ -387,7 +387,7 @@ async function fetchWithRetry(url: string, options: RequestInit, retries = 2) {
 - Update `layout.tsx` metadata:
   ```typescript
   export const metadata = {
-    title: 'LearnAI — AI Learning Assistant',
+    title: 'PocketProfesor — AI Learning Assistant',
     description: 'Transform YouTube videos and PDFs into interactive flashcards, quizzes, and AI-powered study sessions.',
     icons: { icon: '/favicon.ico' },
   };
